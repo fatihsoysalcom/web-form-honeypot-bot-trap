@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Form Honeypot Example</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="email"],
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+        }
+        /* HONEYPOT FIELD: This CSS rule hides the field from legitimate users. */
+        /* Bots, however, often ignore CSS or parse the raw HTML, leading them to fill it. */
+        .honeypot-field {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Web Form Honeypot Example</h1>
+        <p>This example demonstrates a simple honeypot technique to detect automated bots filling out forms. Real users should not interact with the hidden field.</p>
+
+        <form id="contactForm">
+            <div class="form-group">
+                <label for="email">Your Email:</label>
+                <input type="email" id="email" name="email" required placeholder="example@domain.com">
+            </div>
+
+            <!-- THIS IS THE HONEYPOT FIELD -->
+            <!-- It's visually hidden by the 'honeypot-field' CSS class. -->
+            <!-- A human user will never see or fill this field. -->
+            <!-- A bot, however, might parse the HTML and fill all input fields it finds. -->
+            <div class="form-group honeypot-field">
+                <label for="honeypot_name">Leave this field empty:</label>
+                <input type="text" id="honeypot_name" name="honeypot_name" value="">
+                <p>If you see this, something is wrong with the CSS or you're a bot!</p>
+            </div>
+
+            <button type="submit">Submit Form</button>
+        </form>
+
+        <div id="result">
+            Submit the form to see the honeypot detection in action.
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const honeypotField = document.getElementById('honeypot_name');
+            const resultDiv = document.getElementById('result');
+            const userEmail = document.getElementById('email').value;
+
+            // Check if the honeypot field has been filled.
+            // If it has a value, it means a bot (which ignored the 'display: none' CSS) filled it.
+            if (honeypotField.value !== '') {
+                resultDiv.innerHTML = `<strong>Honeypot Triggered!</strong><br>
+                                       A bot likely filled the hidden field. Submission blocked for email: <em>${userEmail}</em>.`;
+                resultDiv.style.backgroundColor = '#f8d7da'; // Light red for error
+                resultDiv.style.borderColor = '#dc3545';
+                resultDiv.style.color = '#721c24';
+            } else {
+                // If the honeypot field is empty, it's likely a human user.
+                resultDiv.innerHTML = `<strong>Form Submitted Successfully!</strong><br>
+                                       (Likely a human user). Email: <em>${userEmail}</em>.`;
+                resultDiv.style.backgroundColor = '#d4edda'; // Light green for success
+                resultDiv.style.borderColor = '#28a745';
+                resultDiv.style.color = '#155724';
+                // In a real application, you would now send the form data to the server.
+            }
+        });
+    </script>
+</body>
+</html>
